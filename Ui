@@ -1,0 +1,296 @@
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+    end wait()
+wait()
+ local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))();
+local Notify = AkaliNotif.Notify;
+
+wait(1);
+
+Notify({
+Description = "WHITLISTED";
+Title = "ULTRA INSTINCT";
+Duration = 2;
+});
+
+local notifications = loadstring(game:HttpGet(("https://raw.githubusercontent.com/AbstractPoo/Main/main/Notifications.lua"),true))()
+notifications:notify{
+    Title = "CONSOLE",
+    Description = "You want to rejoin?",
+    Accept = {
+    Text = "Yes",
+        Callback = function()
+            local tpservice= game:GetService("TeleportService")
+local plr = game.Players.LocalPlayer
+
+tpservice:Teleport(game.PlaceId, plr)
+        end,
+    },
+    Dismiss = {
+        Text = "No",
+        Callback = function()
+            print("Declined")
+        end,
+    }
+}
+
+spawn(function()
+local plr = game:GetService("Players").LocalPlayer
+local run = game:GetService("RunService")
+local uis = game:GetService("UserInputService")
+local cam = workspace.CurrentCamera
+local locked = false
+
+
+function getPointedPlayer()
+local mousePos = uis:GetMouseLocation()
+local results = {math.huge}
+
+for _, player in pairs(game:GetService("Players"):GetChildren()) do
+if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+local pos = cam:WorldToScreenPoint(player.Character.HumanoidRootPart.Position)
+local dist = (Vector2.new(pos.X, pos.Y) - mousePos).Magnitude
+if dist < results[1] and player ~= plr then
+results[1] = dist
+results[2] = player.Character
+end
+end
+end
+
+return results[2]
+end
+
+
+game.Players.LocalPlayer:GetMouse().KeyDown:connect(function(key)
+if key == 'x' then --keybind here
+--[[code here]]--
+locked = not locked
+local target = getPointedPlayer()
+
+while target and target:FindFirstChild("Humanoid") and target:FindFirstChild("HumanoidRootPart") and locked and run.Heartbeat:Wait() do
+cam.CFrame = CFrame.new(cam.CFrame.Position, target.HumanoidRootPart.Position)
+end
+
+locked = false
+end
+end)
+end)
+
+spawn(function()
+local plr = game.Players.LocalPlayer
+local chr = plr.Character
+local root = chr.HumanoidRootPart
+local RunService = game.RunService
+local function getPlayer()
+    local dist, player = math.huge
+    for i,v in next, game.Players:GetChildren() do
+        if v ~= plr then
+            local mag = (root.Position - v.Character.HumanoidRootPart.Position).magnitude
+            if dist > mag then
+                dist = mag
+                player = v
+            end
+        end
+    end
+    return player
+end
+
+RunService.RenderStepped:Connect(function()
+    local mag = (root.Position - getPlayer().Character.HumanoidRootPart.Position).magnitude
+    if mag <= 18 then
+game:GetService("VirtualInputManager"):SendKeyEvent(true, "S", false, game)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,.2)
+wait(.3)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(-.2,0,0)
+wait(.3)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(.2,0,0)
+wait(.1)
+game:GetService("VirtualInputManager"):SendKeyEvent(false, "S", false, game)
+    end
+end)
+end)
+spawn(function()
+local lp = game.Players.LocalPlayer
+
+local animationInfo = {}
+
+function getInfo(id)
+  local success, info = pcall(function()
+      return game:GetService("MarketplaceService"):GetProductInfo(id)
+  end)
+  if success then
+      return info
+  end
+  return {Name=''}
+end
+function block(player)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,0)
+wait(1)
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+local function GetClosestPlayer()
+   local target = nil
+   local distance = math.huge
+ 
+   for i,v in next, Players:GetPlayers() do
+       if v and v ~= lp and v.Character and v.Character:FindFirstChildOfClass('Humanoid') and v.Character:FindFirstChildOfClass('Humanoid').RootPart then
+           local plrdist = lp:DistanceFromCharacter(v.Character:FindFirstChildOfClass('Humanoid').RootPart.CFrame.p)
+           if plrdist < distance then
+               target = v
+               distance = plrdist
+           end
+       end
+   end
+ 
+   return target
+end
+
+lp.Character:FindFirstChildOfClass("Humanoid").RootPart.CFrame = GetClosestPlayer().Character:FindFirstChildOfClass('Humanoid').RootPart.CFrame
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,0,25)
+end
+
+local AnimNames = {
+  'anim4', -- animations names
+  'anim1edited', -- animations names
+  'anim2',
+  'anim3',-- animations names
+}
+
+function playerAdded(v)
+    local function charadded(char)
+      local humanoid = char:WaitForChild("Humanoid", 5)
+      if humanoid then
+          humanoid.AnimationPlayed:Connect(function(track)
+              local info = animationInfo[track.Animation.AnimationId]
+              if not info then
+                  info = getInfo(tonumber(track.Animation.AnimationId:match("%d+")))
+                  animationInfo[track.Animation.AnimationId] = info
+              end
+             
+              if (lp.Character and lp.Character:FindFirstChild("Head") and v.Character:FindFirstChild("Head")) then
+                  local mag = (v.Character.Head.Position - lp.Character.Head.Position).Magnitude
+                  if mag < 30  then
+                     
+                      for _, animName in pairs(AnimNames) do
+                          if info.Name:match(animName) then
+                              pcall(block, v)
+                          end
+                      end
+                     
+                  end
+              end
+          end)
+      end
+  end
+ 
+  if v.Character then
+      charadded(v.Character)
+  end
+  v.CharacterAdded:Connect(charadded)
+end
+
+for i,v in pairs(game.Players:GetPlayers()) do
+   if v ~= lp then
+       playerAdded(v)
+   end
+end
+
+game.Players.PlayerAdded:Connect(playerAdded)
+end)
+spawn(function()
+local plr = game.Players.LocalPlayer
+local chr = plr.Character
+local root = chr.HumanoidRootPart
+local RunService = game.RunService
+local function getPlayer()
+    local dist, player = math.huge
+    for i,v in next, game.Players:GetChildren() do
+        if v ~= plr then
+            local mag = (root.Position - v.Character.HumanoidRootPart.Position).magnitude
+            if dist > mag then
+                dist = mag
+                player = v
+            end
+        end
+    end
+    return player
+end
+
+RunService.RenderStepped:Connect(function()
+    local mag = (root.Position - getPlayer().Character.HumanoidRootPart.Position).magnitude
+    if mag <= 18 then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,1,0)
+    end
+end)
+end)
+spawn(function()
+local hi = Instance.new("Sound")
+hi.Name = "Sound"
+hi.SoundId = "http://www.roblox.com/asset/?id=1677094219"
+hi.Volume = 10
+hi.Looped = true
+hi.archivable = false
+hi.Parent = game.Workspace
+
+if game.Players.LocalPlayer.Character.Humanoid.Health > 10 then
+hi:Play()
+end
+end)
+spawn(function()
+function Aura(id, color, emis, inf, par)
+    Evil = Instance.new'ParticleEmitter'
+    Evil.Parent = par
+    Evil.Texture = id
+    Evil.Drag = 0
+    Evil.LockedToPart = true
+    Evil.Rate = 50
+    Evil.Lifetime = NumberRange.new(.5, .5)
+    Evil.LightEmission = emis
+    Evil.LightInfluence = inf
+    Evil.Speed = NumberRange.new(0, 1)
+    Evil.Color = ColorSequence.new(color)
+    numberKeypoints2 = {
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    Evil.Rotation = NumberRange.new(60, 60)
+    Evil.Size = NumberSequence.new(numberKeypoints2)
+end
+
+for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+    if v:IsA'BasePart' and v.Name ~= 'HumanoidRootPart' then
+        Aura('rbxassetid://8098509063', Color3.fromRGB(240,248,255), 1, 0, v)
+        Aura('rbxassetid://8098512076', Color3.fromRGB(70,130,180), 1, 0, v)
+        Aura('rbxassetid://8098503421', Color3.fromRGB(0,0,255), 0, 1, v)
+    end
+end
+
+ function Aura(id, color, emis, inf, par)
+    Evil = Instance.new'ParticleEmitter'
+    Evil.Parent = par
+    Evil.Texture = id
+    Evil.Drag = 0
+    Evil.LockedToPart = true
+    Evil.Rate = 50
+    Evil.Lifetime = NumberRange.new(.5, .5)
+    Evil.LightEmission = emis
+    Evil.LightInfluence = inf
+    Evil.Speed = NumberRange.new(0, 1)
+    Evil.Color = ColorSequence.new(color)
+    numberKeypoints2 = {
+        NumberSequenceKeypoint.new(0, 1),
+        NumberSequenceKeypoint.new(1, 0)
+    }
+    Evil.Rotation = NumberRange.new(60, 60)
+    Evil.Size = NumberSequence.new(numberKeypoints2)
+end
+
+for i,v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+    if v:IsA'BasePart' and v.Name ~= 'HumanoidRootPart' then
+        Aura('rbxassetid://8098509063', Color3.fromRGB(240,248,255), 1, 0, v)
+        Aura('rbxassetid://8098512076', Color3.fromRGB(72,61,139), 1, 0, v)
+        Aura('rbxassetid://8098503421', Color3.fromRGB(0,0,255), 0, 1, v)
+    end
+end
+end)
